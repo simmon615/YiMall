@@ -10,7 +10,9 @@ import Cart from './pages/Cart';
 import Withdraw from './pages/Withdraw';
 import TopUp from './pages/TopUp';
 import Orders from './pages/Orders';
+import OrderDetail from './pages/OrderDetail';
 import AddressSelect from './pages/AddressSelect';
+import AddressForm from './pages/AddressForm';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
 import Support from './pages/Support';
@@ -93,7 +95,10 @@ const AppContent = () => {
             <Route path="/withdraw" element={<ProtectedRoute><Withdraw /></ProtectedRoute>} />
             <Route path="/topup" element={<ProtectedRoute><TopUp /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+            <Route path="/order/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
             <Route path="/address-select" element={<ProtectedRoute><AddressSelect /></ProtectedRoute>} />
+            <Route path="/address/new" element={<ProtectedRoute><AddressForm /></ProtectedRoute>} />
+            <Route path="/address/edit/:id" element={<ProtectedRoute><AddressForm /></ProtectedRoute>} />
             <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />

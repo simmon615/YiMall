@@ -1,30 +1,44 @@
-
-import React from 'react';
-import { MapPin, Search, Globe, Filter, ShoppingBag, ShoppingCart } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Search, Globe, Filter, ShoppingBag, ShoppingCart, Smartphone, Shirt, Coffee, Watch, Laptop } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
+// Mock Categories
+const CATEGORIES = [
+  { id: 'all', name: 'All', icon: null },
+  { id: 'tech', name: 'Electronics', icon: <Smartphone size={16} /> },
+  { id: 'fashion', name: 'Fashion', icon: <Shirt size={16} /> },
+  { id: 'food', name: 'Food', icon: <Coffee size={16} /> },
+  { id: 'beauty', name: 'Beauty', icon: <Watch size={16} /> }, // Using Watch as placeholder
+  { id: 'home', name: 'Home', icon: <Laptop size={16} /> },
+];
+
 // Mock Data
 const PRODUCTS = [
-  { id: 1, name: 'iPhone 15 Pro Max', price: 1199, points: 600, image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400&q=80' },
-  { id: 2, name: 'Khmer Silk Scarf', price: 45, points: 22, image: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&q=80' },
-  { id: 3, name: 'Organic Jasmine Rice', price: 25, points: 12, image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80' },
-  { id: 4, name: 'Sony WH-1000XM5', price: 349, points: 175, image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&q=80' },
-  { id: 5, name: 'Dior Sauvage Elixir', price: 180, points: 90, image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80' },
-  { id: 6, name: 'MacBook Air M2', price: 999, points: 500, image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400&q=80' },
+  { id: 1, category: 'tech', name: 'iPhone 15 Pro Max', price: 1199, points: 600, image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400&q=80' },
+  { id: 2, category: 'fashion', name: 'Khmer Silk Scarf', price: 45, points: 22, image: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&q=80' },
+  { id: 3, category: 'food', name: 'Organic Jasmine Rice', price: 25, points: 12, image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80' },
+  { id: 4, category: 'tech', name: 'Sony WH-1000XM5', price: 349, points: 175, image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&q=80' },
+  { id: 5, category: 'beauty', name: 'Dior Sauvage Elixir', price: 180, points: 90, image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80' },
+  { id: 6, category: 'tech', name: 'MacBook Air M2', price: 999, points: 500, image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400&q=80' },
 ];
 
 const Home = () => {
   const navigate = useNavigate();
   const { totalItems } = useCart();
   const { language, setLanguage, t } = useLanguage();
+  const [activeCategory, setActiveCategory] = useState('all');
   
   // Cycle languages for the quick button
   const toggleLang = () => {
     const nextLang = language === 'km' ? 'en' : (language === 'en' ? 'zh' : 'km');
     setLanguage(nextLang);
   };
+
+  const filteredProducts = activeCategory === 'all'
+    ? PRODUCTS
+    : PRODUCTS.filter(p => p.category === activeCategory);
 
   // PRD 5.1: Top Bar
   const TopBar = () => (
@@ -93,27 +107,57 @@ const Home = () => {
     </div>
   );
 
+  // Categories Scroll
+  const CategoryList = () => (
+    <div className="bg-white px-4 py-3 mb-2 shadow-sm overflow-x-auto no-scrollbar flex gap-4">
+      {CATEGORIES.map(cat => (
+        <div 
+          key={cat.id}
+          onClick={() => setActiveCategory(cat.id)}
+          className={`flex flex-col items-center gap-1 min-w-[60px] cursor-pointer transition-colors ${
+            activeCategory === cat.id ? 'text-primary' : 'text-gray-500'
+          }`}
+        >
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            activeCategory === cat.id ? 'bg-orange-100' : 'bg-gray-100'
+          }`}>
+            {cat.icon || <Filter size={16} />}
+          </div>
+          <span className={`text-[10px] font-medium ${activeCategory === cat.id ? 'font-bold' : ''}`}>
+            {cat.name}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100 pb-20">
       <TopBar />
       
       <div className="main-content">
         <QuickAccess />
 
         {/* Banner Placeholder */}
-        <div className="mx-4 mb-4 h-32 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg shadow-sm flex items-center justify-center text-white font-bold text-center px-4">
-          {t('banner_text')}
+        <div className="mx-4 mb-4 h-32 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg shadow-sm flex items-center justify-center text-white font-bold text-center px-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="relative z-10">
+            <div className="text-xl mb-1">🎄</div>
+            {t('banner_text')}
+          </div>
         </div>
+
+        <CategoryList />
 
         {/* PRD 5.2: Product Feed */}
         <div className="px-4 pb-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-bold text-lg text-gray-800">{t('recommendation')}</h2>
-            <Filter size={16} className="text-gray-400" />
+            <div className="text-xs text-gray-400">{filteredProducts.length} items</div>
           </div>
 
-          <div className="grid-cols-2">
-            {PRODUCTS.map(product => (
+          <div className="grid grid-cols-2 gap-3">
+            {filteredProducts.map(product => (
               <div 
                 key={product.id} 
                 className="bg-white rounded-lg overflow-hidden shadow-sm cursor-pointer active:opacity-90 transition-opacity"
@@ -140,6 +184,12 @@ const Home = () => {
               </div>
             ))}
           </div>
+          
+          {filteredProducts.length === 0 && (
+             <div className="text-center py-10 text-gray-400">
+               No products found in this category.
+             </div>
+          )}
         </div>
       </div>
     </div>
