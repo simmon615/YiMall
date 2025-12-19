@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  # Web Server (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: yimall_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./infrastructure/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - yimall_net
+
+  # Laravel App Container
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: yimall_app
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      - CONTAINER_ROLE=app
+    networks:
+      - yimall_net
+
+  # Database
+  mysql:
+    image: mysql:8.0
+    container_name: yimall_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: yimall
+    volumes:
+      - ./infrastructure/mysql:/var/lib/mysql
+    networks:
+      - yimall_net
+
+  # Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: yimall_redis
+    volumes:
+      - ./infrastructure/redis:/data
+    networks:
+      - yimall_net
+
+networks:
+  yimall_net:
+    driver: bridge
